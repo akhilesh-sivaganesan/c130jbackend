@@ -1,0 +1,8 @@
+applications:
+- name: c-130j-shortages-backend
+  docker:
+    image: lmregistry.us.lmco.com/lmc.aero.prowat/c-130j-shortages-backend
+  disk_quota: 4G
+  routes:
+    - route: c-130j-shortages-backend.apps.pgw2.us.lmco.com
+  timeout: 600

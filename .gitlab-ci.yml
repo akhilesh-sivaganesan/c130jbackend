@@ -1,0 +1,35 @@
+variables:
+  HTTP_PROXY: http://proxy-zsgov.external.lmco.com:80/
+  HTTPS_PROXY: http://proxy-zsgov.external.lmco.com:80/
+  REGISTRY_URL: lmregistry.us.lmco.com
+  PROJECT_NAME: lmc.aero.prowat
+  IMAGE_NAME : $PROJECT_NAME/c-130j-shortages-backend
+  IMAGE_TAG: latest
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  script:
+    - echo $DOCKER_REGISTRY_USERNAME
+    - docker login $REGISTRY_URL --username $DOCKER_REGISTRY_USERNAME --password $DOCKER_REGISTRY_PASSWORD
+    - docker build --build-arg HTTP_PROXY=$HTTP_PROXY --build-arg HTTPS_PROXY=$HTTPS_PROXY --tag $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG .
+    - docker push $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG
+  tags:
+    - docker-builder
+
+deploy:
+  stage: deploy
+  image: lmregistry.us.lmco.com/lmc.eo.swf.internal/pcf-cli@sha256:394e409585a15d0779bc2aab933aefa2740122e68cd8b796d8bb8cf2fbed7094
+
+  script:
+    - cf login -a api.system.pgw2.us.lmco.com -u $PCF_USER -p $PCF_PASSWORD
+    - cf target -o aero -s aero-web-apps
+    - cf push -f manifest.yml
+    - cf logout
+    
