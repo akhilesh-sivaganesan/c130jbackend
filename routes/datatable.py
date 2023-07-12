@@ -74,15 +74,17 @@ def get_owner_data(owner):
 @cross_origin()
 def create_data():
     data = request.get_json(force=True)
-    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');" % (
+    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') RETURNING id;" % (
         data['business_unit'], data['ship'], data['tve'], data['part_number'], data['description'], data['assembly'], data['qty'], data['code'], data['owner'], data['need_date'], data['ecd'], data['impact'], data['comment'], data['status'], data['last_edit'], data['added_date'], data['on_board'], data['closed_date'], data['manager'], data['ntid']))
-    con.execute(insert_query)
+    result = con.execute(insert_query)
+    new_id = result.fetchone()[0]
 
     commit_text = text("COMMIT;")
     con.execute(commit_text)
 
     # HTTP 201 Created
-    return "Data was successfully created.", 201
+    return jsonify({"Data was successfully created. id": new_id}), 201
+
 
 # Update a template and its nodes
 
