@@ -4,8 +4,7 @@ import os
 from flask_cors import CORS, cross_origin
 from config import app, con
 from flask_swagger_ui import get_swaggerui_blueprint
-from routes.templates import *
-from routes.checklists import *
+from routes.datatable import *
 
 SWAGGER_URL = '/swagger'
 API_URL = '/swagger.json'

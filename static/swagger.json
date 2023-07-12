@@ -1,259 +1,167 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Checklist API",
+    "title": "Datatable API",
     "version": "1.0"
   },
   "tags": [
     {
-      "name": "templates",
-      "description": "Endpoints for managing templates"
-    },
-    {
-      "name": "checklists",
-      "description": "Endpoints for managing checklists"
+      "name": "datatable",
+      "description": "Endpoints for managing data in the datatable table"
     }
   ],
   "paths": {
-    "/templates": {
+    "/datatable/all": {
       "get": {
-        "tags": ["templates"],
-        "summary": "Get all templates and their nodes",
-        "description": "Retrieves all templates and their nodes from the database.",
+        "tags": [
+          "datatable"
+        ],
+        "summary": "Get all data",
+        "description": "Retrieves all rows from the datatable table.",
         "responses": {
           "200": {
-            "description": "Templates found",
+            "description": "Data found",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/TemplateNodes"
+                "$ref": "#/definitions/Data"
               }
             }
           }
         }
-      },
-      "post": {
-        "tags": ["templates"],
-        "summary": "Create a new template along with template nodes",
-        "description": "Creates a new template and its nodes in the database.",
+      }
+    },
+    "/datatable/open": {
+      "get": {
+        "tags": [
+          "datatable"
+        ],
+        "summary": "Get open data",
+        "description": "Retrieves all rows from the datatable table where the status column is equal to 'OPEN'.",
+        "responses": {
+          "200": {
+            "description": "Data found",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Data"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datatable/{owner}": {
+      "get": {
+        "tags": [
+          "datatable"
+        ],
+        "summary": "Get data for a specific owner",
+        "description": "Retrieves all rows from the datatable table where the owner column is equal to the specified owner.",
         "parameters": [
           {
-            "name": "template",
+            "name": "owner",
+            "in": "path",
+            "description": "Owner of the data to retrieve",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data found",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Data"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datatable": {
+      "post": {
+        "tags": [
+          "datatable"
+        ],
+        "summary": "Create new data",
+        "description": "Inserts a new row into the datatable table with the provided values.",
+        "parameters": [
+          {
+            "name": "data",
             "in": "body",
-            "description": "Template to create",
+            "description": "Data to create",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/TemplateNodes"
+              "$ref": "#/definitions/Data"
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "Template created",
+            "description": "Data created",
             "schema": {
-              "$ref": "#/definitions/TemplateNodes"
+              "$ref": "#/definitions/Data"
             }
           }
         }
       }
     },
-    "/templates/{id}": {
-      "get": {
-        "tags": ["templates"],
-        "summary": "Get a template and its nodes by template_ID",
-        "description": "Retrieves a template from the database by its ID.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the template to retrieve",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Template found",
-            "schema": {
-              "$ref": "#/definitions/TemplateNodes"
-            }
-          },
-          "404": {
-            "description": "Template not found"
-          }
-        }
-      },
+    "/datatable/{id}": {
       "put": {
-        "tags": ["templates"],
-        "summary": "Update a template and its nodes",
-        "description": "Updates an existing template in the database.",
+        "tags": [
+          "datatable"
+        ],
+        "summary": "Update data",
+        "description": "Updates an existing row in the datatable table with the provided values.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the template to retrieve",
+            "description": "ID of the data to update",
             "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
-            "name": "template",
+            "name": "data",
             "in": "body",
-            "description": "Template data to update",
+            "description": "Data to update",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/TemplateNodes"
+              "$ref": "#/definitions/Data"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Template updated",
+            "description": "Data updated",
             "schema": {
-              "$ref": "#/definitions/Template"
+              "$ref": "#/definitions/Data"
             }
           }
         }
       },
       "delete": {
-        "tags": ["templates"],
-        "summary": "Delete a template",
-        "description": "Deletes an existing template from the database.",
+        "tags": [
+          "datatable"
+        ],
+        "summary": "Delete data",
+        "description": "Deletes an existing row from the datatable table.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the template to delete",
+            "description": "ID of the data to delete",
             "required": true,
-            "type": "string"
+            "type": "integer"
           }
         ],
         "responses": {
           "200": {
-            "description": "Template deleted",
+            "description": "Data deleted",
             "schema": {
-              "$ref": "#/definitions/Template"
-            }
-          }
-        }
-      }
-    },
-    "/checklists": {
-      "get": {
-        "tags": ["checklists"],
-        "summary": "Get all checklists and their nodes",
-        "description": "Retrieves all checklists and their nodes from the database.",
-        "responses": {
-          "200": {
-            "description": "checklists found",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ChecklistNodes"
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": ["checklists"],
-        "summary": "Create a new checklist along with checklist nodes",
-        "description": "Creates a new checklist and its nodes in the database.",
-        "parameters": [
-          {
-            "name": "checklist",
-            "in": "body",
-            "description": "checklist to create",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/ChecklistNodes"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Template created",
-            "schema": {
-              "$ref": "#/definitions/ChecklistNodes"
-            }
-          }
-        }
-      }
-    },
-    "/checklists/{id}": {
-      "get": {
-        "tags": ["checklists"],
-        "summary": "Get a checklist and its nodes by checklist_ID",
-        "description": "Retrieves a checklist from the database by its ID.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the checklist to retrieve",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "checklist found",
-            "schema": {
-              "$ref": "#/definitions/ChecklistNodes"
-            }
-          },
-          "404": {
-            "description": "checklist not found"
-          }
-        }
-      },
-      "put": {
-        "tags": ["checklists"],
-        "summary": "Update a checklist and its nodes",
-        "description": "Updates an existing checklist in the database.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the checklist to retrieve",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "checklist",
-            "in": "body",
-            "description": "checklist data to update",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/ChecklistNodes"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "checklist updated",
-            "schema": {
-              "$ref": "#/definitions/Checklist"
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": ["checklists"],
-        "summary": "Delete a checklist",
-        "description": "Deletes an existing checklist from the database.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the checklist to delete",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "checklist deleted",
-            "schema": {
-              "$ref": "#/definitions/Checklist"
+              "$ref": "#/definitions/Data"
             }
           }
         }
@@ -261,154 +169,80 @@
     }
   },
   "definitions": {
-    "Template": {
+    "Data": {
       "type": "object",
       "properties": {
-        "template_id": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "business_unit": {
+          "type": "string"
+        },
+        "ship": {
+          "type": "string"
+        },
+        "tve": {
+          "type": "string"
+        },
+        "part_number": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "assembly": {
+          "type": "string"
+        },
+        "qty": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "code": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "need_date": {
           "type": "string",
-          "example": "7d9315a0-fa47-482e-85d8-1d48443fc538"
+          "format": "date-time"
         },
-        "template_title": {
+        "ecd": {
           "type": "string",
-          "example": "Flight Towing List"
+          "format": "date-time"
         },
-        "template_owner_id": {
+        "impact": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "last_edit": {
           "type": "string",
-          "example": "akhilesh"
+          "format": "date-time"
         },
-        "template_created_at":{
-          "type":"string",
-          "format":"date-time"
-        }
-      }
-    },
-    "TemplateNodes": {
-      "type": "object",
-      "properties": {
-        "template_id": {
+        "added_date": {
           "type": "string",
-          "example": "12345"
+          "format": "date-time"
         },
-        "template_title": {
+        "on_board": {
+          "type": "boolean"
+        },
+        "closed_date": {
           "type": "string",
-          "example": "Flight Towing List"
+          "format": "date-time"
         },
-        "template_owner_id": {
-          "type": "string",
-          "example": "akhilesh"
-        },
-        "template_created_at":{
-          "type":"string",
-          "format":"date-time"
-        },
-        "template_nodes":{
-          "type":"array",
-          "items":{
-            "$ref":"#/definitions/TemplateNode"
-          }
-        }
-      }
-    },
-    "TemplateNode":{
-      "type":"object",
-      "properties":{
-        "node_id":{
-          "type":"string",
-          "example":"123321"
-        },
-        "node_title":{
-          "type":"string",
-          "example":"Caution Title"
-        },
-        "node_description":{
-          "type":"string",
-          "example":"<p>Enter description for this caution.</p>"
-        },
-        "node_type":{
-          "type":"string",
-          "example":"Caution"
-        },
-        "template_id":{
-          "type":"string",
-          "example":"12345"
-        },
-        "node_index":{
-          "type":"integer",
-          "example":1
-        }
-      }
-    },
-    "ChecklistNodes": {
-      "type": "object",
-      "properties": {
-        "checklist_id": {
-          "type": "string",
-          "example": "12345"
-        },
-        "checklist_title": {
-          "type": "string",
-          "example": "Flight Towing List"
-        },
-        "checklist_created_at":{
-          "type":"string",
-          "format":"date-time"
-        },
-        "checklist_nodes":{
-          "type":"array",
-          "items":{
-            "$ref":"#/definitions/ChecklistNode"
-          }
-        },
-        "user_id": {
-          "type": "string",
-          "example": "Manager"
-        },
-        "checklist_completion": {
-          "type": "boolean",
-          "example": false
-        },
-        "checklist_completion_timestamp": {
-          "type":"string",
-          "format":"date-time"
-        }
-      }
-    },
-    "ChecklistNode":{
-      "type":"object",
-      "properties":{
-        "checklist_node_id":{
-          "type":"string",
-          "example":"123321"
-        },
-        "checklist_id":{
-          "type":"string",
-          "example":"12345"
-        },
-        "checklist_node_title":{
-          "type":"string",
-          "example":"Caution Title"
-        },
-        "checklist_node_description":{
-          "type":"string",
-          "example":"<p>Enter description for this caution.</p>"
-        },
-        "checklist_node_type":{
-          "type":"string",
-          "example":"Caution"
-        },
-        "checklist_node_completion":{
-          "type":"boolean",
-          "example":false
-        },
-        "checklist_node_completion_timestamp":{
-          "type":"string",
-          "format":"date-time"
-        },
-        "checklist_node_index":{
-          "type":"integer",
-          "example":1
+        "manager": {
+          "type": "string"
         }
       }
     }
   }
 }
+
+
+
