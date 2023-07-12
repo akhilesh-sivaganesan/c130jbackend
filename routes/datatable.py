@@ -31,7 +31,8 @@ def get_all_data():
 @app.route('/datatable/open', methods=['GET'])
 @cross_origin()
 def get_open_data():
-    select_query = text('SELECT * FROM osf_public.datatable WHERE status = OPEN')
+    select_query = text(
+        'SELECT * FROM osf_public.datatable WHERE status = OPEN')
     rs = con.execute(select_query)
     rows = rs.fetchall()
     final_result = []
@@ -46,7 +47,6 @@ def get_open_data():
         final_result.append(tempDict)
     final_response = jsonify(final_result)
     return final_response, 200
-
 
 
 @app.route('/datatable/<string:owner>', methods=['GET'])
@@ -74,8 +74,8 @@ def get_owner_data(owner):
 @cross_origin()
 def create_data():
     data = request.get_json(force=True)
-    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s');" % (
-        data['business_unit'], data['ship'], data['tve'], data['part_number'], data['description'], data['assembly'], data['qty'], data['code'], data['owner'], data['need_date'], data['ecd'], data['impact'], data['comment'], data['status'], data['last_edit'], data['added_date'], data['on_board'], data['closed_date'], data['manager']))
+    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');" % (
+        data['business_unit'], data['ship'], data['tve'], data['part_number'], data['description'], data['assembly'], data['qty'], data['code'], data['owner'], data['need_date'], data['ecd'], data['impact'], data['comment'], data['status'], data['last_edit'], data['added_date'], data['on_board'], data['closed_date'], data['manager'], data['ntid']))
     con.execute(insert_query)
 
     commit_text = text("COMMIT;")
@@ -84,22 +84,23 @@ def create_data():
     # HTTP 201 Created
     return "Data was successfully created.", 201
 
-
 # Update a template and its nodes
+
 
 @app.route('/datatable/<int:_id>', methods=['PUT'])
 @cross_origin()
 def update_data(_id):
     data = request.get_json(force=True)
-    update_query = text("UPDATE datatable SET business_unit = :business_unit, ship = :ship, tve = :tve, part_number = :part_number, description = :description, assembly = :assembly, qty = :qty, code = :code, owner = :owner, need_date = :need_date, ecd = :ecd, impact = :impact, comment = :comment, status = :status, last_edit = :last_edit, added_date = :added_date, on_board = :on_board, closed_date = :closed_date, manager = :manager WHERE id = :id")
+    update_query = text("UPDATE datatable SET business_unit = :business_unit, ship = :ship, tve = :tve, part_number = :part_number, description = :description, assembly = :assembly, qty = :qty, code = :code, owner = :owner, need_date = :need_date, ecd = :ecd, impact = :impact, comment = :comment, status = :status, last_edit = :last_edit, added_date = :added_date, on_board = :on_board, closed_date = :closed_date, manager = :manager, ntid = :ntid WHERE id = :id")
     con.execute(update_query, {
-        'business_unit': data['business_unit'], 'ship': data['ship'], 'tve': data['tve'], 'part_number': data['part_number'], 'description': data['description'], 'assembly': data['assembly'], 'qty': data['qty'], 'code': data['code'], 'owner': data['owner'], 'need_date': data['need_date'], 'ecd': data['ecd'], 'impact': data['impact'], 'comment': data['comment'], 'status': data['status'], 'last_edit': data['last_edit'], 'added_date': data['added_date'], 'on_board': data['on_board'], 'closed_date': data['closed_date'], 'manager': data['manager'], 'id': _id})
+        'business_unit': data['business_unit'], 'ship': data['ship'], 'tve': data['tve'], 'part_number': data['part_number'], 'description': data['description'], 'assembly': data['assembly'], 'qty': data['qty'], 'code': data['code'], 'owner': data['owner'], 'need_date': data['need_date'], 'ecd': data['ecd'], 'impact': data['impact'], 'comment': data['comment'], 'status': data['status'], 'last_edit': data['last_edit'], 'added_date': data['added_date'], 'on_board': data['on_board'], 'closed_date': data['closed_date'], 'manager': data['manager'], 'ntid': data['ntid'], 'id': _id})
 
     commit_text = text("COMMIT;")
     con.execute(commit_text)
 
     # HTTP 200 OK
     return jsonify({"Data was successfully updated. id": _id}), 200
+
 
 @app.route('/datatable/<int:_id>', methods=['DELETE'])
 @cross_origin()

@@ -238,6 +238,9 @@
         },
         "manager": {
           "type": "string"
+        },
+        "ntid": {
+          "type": "string"
         }
       }
     }
