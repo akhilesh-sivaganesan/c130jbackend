@@ -32,7 +32,7 @@ def get_all_data():
 @cross_origin()
 def get_open_data():
     select_query = text(
-        'SELECT * FROM osf_public.datatable WHERE status = OPEN')
+        "SELECT * FROM osf_public.datatable WHERE status = 'OPEN'")
     rs = con.execute(select_query)
     rows = rs.fetchall()
     final_result = []
@@ -49,7 +49,7 @@ def get_open_data():
     return final_response, 200
 
 
-@app.route('/datatable/<string:owner>', methods=['GET'])
+@app.route('/datatable/owner/<string:owner>', methods=['GET'])
 @cross_origin()
 def get_owner_data(owner):
     select_query = text(
@@ -74,8 +74,8 @@ def get_owner_data(owner):
 @cross_origin()
 def create_data():
     data = request.get_json(force=True)
-    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') RETURNING id;" % (
-        data['business_unit'], data['ship'], data['tve'], data['part_number'], data['description'], data['assembly'], data['qty'], data['code'], data['owner'], data['need_date'], data['ecd'], data['impact'], data['comment'], data['status'], data['last_edit'], data['added_date'], data['on_board'], data['closed_date'], data['manager'], data['ntid']))
+    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s') RETURNING id;" % (
+        data['business_unit'], data['ship'], data['tve'], data['part_number'], data['description'], data['assembly'], data['qty'], data['code'], data['owner'], data['need_date'], data['ecd'], data['impact'], data['comment'], data['status'], data['last_edit'], data['added_date'], data['on_board'], data['manager'], data['ntid']))
     result = con.execute(insert_query)
     new_id = result.fetchone()[0]
 
