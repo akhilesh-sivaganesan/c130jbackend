@@ -69,6 +69,13 @@ def get_owner_data(owner):
     final_response = jsonify(final_result)
     return final_response, 200
 
+@app.route('/datatable/owners', methods=['GET'])
+def get_owners():
+    select_query = text('SELECT DISTINCT owner FROM datatable')
+    rs = con.execute(select_query)
+    rows = rs.fetchall()
+    owners = [row[0] for row in rows]
+    return jsonify(owners), 200
 
 @app.route('/datatable', methods=['POST'])
 @cross_origin()

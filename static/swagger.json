@@ -13,9 +13,7 @@
   "paths": {
     "/datatable/all": {
       "get": {
-        "tags": [
-          "datatable"
-        ],
+        "tags": ["datatable"],
         "summary": "Get all data",
         "description": "Retrieves all rows from the datatable table.",
         "responses": {
@@ -33,9 +31,7 @@
     },
     "/datatable/open": {
       "get": {
-        "tags": [
-          "datatable"
-        ],
+        "tags": ["datatable"],
         "summary": "Get open data",
         "description": "Retrieves all rows from the datatable table where the status column is equal to 'OPEN'.",
         "responses": {
@@ -53,9 +49,7 @@
     },
     "/datatable/{owner}": {
       "get": {
-        "tags": [
-          "datatable"
-        ],
+        "tags": ["datatable"],
         "summary": "Get data for a specific owner",
         "description": "Retrieves all rows from the datatable table where the owner column is equal to the specified owner.",
         "parameters": [
@@ -80,11 +74,27 @@
         }
       }
     },
+    "/datatable/owners": {
+      "get": {
+        "tags": ["datatable"],
+        "summary": "Get unique owners",
+        "description": "Retrieves the unique set of owners from the datatable table.",
+        "responses": {
+          "200": {
+            "description": "Owners found",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
     "/datatable": {
       "post": {
-        "tags": [
-          "datatable"
-        ],
+        "tags": ["datatable"],
         "summary": "Create new data",
         "description": "Inserts a new row into the datatable table with the provided values.",
         "parameters": [
@@ -110,9 +120,7 @@
     },
     "/datatable/{id}": {
       "put": {
-        "tags": [
-          "datatable"
-        ],
+        "tags": ["datatable"],
         "summary": "Update data",
         "description": "Updates an existing row in the datatable table with the provided values.",
         "parameters": [
@@ -143,9 +151,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "datatable"
-        ],
+        "tags": ["datatable"],
         "summary": "Delete data",
         "description": "Deletes an existing row from the datatable table.",
         "parameters": [
@@ -246,6 +252,3 @@
     }
   }
 }
-
-
-
