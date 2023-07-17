@@ -83,8 +83,8 @@ def get_owners():
 @cross_origin()
 def create_data():
     data = request.get_json(force=True)
-    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, previous_ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s') RETURNING id;" % (
-        data['business_unit'], data['ship'], data['tve'], data['part_number'], data['description'], data['assembly'], data['qty'], data['code'], data['owner'], data['need_date'], data['ecd'], data['previous_ecd'], data['impact'], data['comment'], data['status'], data['last_edit'], data['added_date'], data['on_board'], data['manager'], data['ntid']))
+    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, previous_ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s') RETURNING id;" % (
+        data['business_unit'], data['ship'], data['tve'], data['part_number'], data['description'], data['assembly'], data['qty'], data['code'], data['owner'], data['need_date'], data['ecd'], data['impact'], data['comment'], data['status'], data['last_edit'], data['added_date'], data['on_board'], data['manager'], data['ntid']))
     result = con.execute(insert_query)
     new_id = result.fetchone()[0]
 
@@ -123,3 +123,54 @@ def delete_data(_id):
 
     # HTTP 200 OK
     return jsonify({"Data was successfully deleted. id": _id}), 200
+
+def parse_date(date_str):
+    if not date_str:
+        return None
+    try:
+        return datetime.strptime(date_str, '%m/%d/%Y').date()
+    except ValueError:
+        return None
+
+def parse_int(int_str):
+    if not int_str:
+        return None
+    try:
+        return int(int_str)
+    except ValueError:
+        return None
+
+@app.route('/datatable/sync', methods=['POST'])
+def sync():
+    try:
+        data = request.get_json(force=True)
+        # print(data)
+        # Insert data into Postgres table
+        for row in data:
+            # Validate data
+            row['closed_date'] = parse_date(row['closed_date'])
+            row['last_edit'] = parse_date(row['last_edit'])
+            row['need_date'] = parse_date(row['need_date'])
+            row['qty'] = parse_int(row['qty'])
+            row['ecd'] = parse_date(row['ecd'])
+            row['added_date'] = parse_date(row['added_date'])
+
+            # Check if previous_ecd is present in row
+            if 'previous_ecd' not in row:
+                row['previous_ecd'] = None
+            else:
+                row['previous_ecd'] = parse_date(row['previous_ecd'])
+            # Check if ntid is present in row
+            if 'ntid' not in row:
+                row['ntid'] = None
+            # Create insert statement
+            insert_stmt = text('INSERT INTO osf_public.datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid, previous_ecd) VALUES (:business_unit,:ship,:tve,:part_number,:description,:assembly,:qty,:code,:owner,:need_date,:ecd,:impact,:comment,:status,:last_edit,:added_date,:on_board,:closed_date,:manager,:ntid,:previous_ecd)')
+            # Execute insert statement
+            con.execute(insert_stmt,row)
+        return 'Data synced successfully', 200
+    except Exception as error:
+        print(error)
+        return 'An error occurred while syncing data', 500
+
+
+
