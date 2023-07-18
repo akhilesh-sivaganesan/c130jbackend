@@ -1,9 +1,11 @@
 import inspect
 import time
+import json
+import requests
 # Import Utility Functions
 import sys
 # sys.path.append('utils')
-from .lmco_email import lmco_email as le
+from lmco_email import lmco_email as le
 # This for local email run
 # import lmco_email as le
 
@@ -62,68 +64,60 @@ def send_feedback(feedback,request):
     )
     print("Email Sent")
 
+def send_update_email(data):
+    # Extract the NTID from the data
+    ntid = data['ntid']
 
+    # Make an API call to the EWP PersonService to get the email address for the NTID
+    ewp_url = f"https://api-ewp.global.lmco.com/PersonService?Search={ntid}&APIKey=f3505421-a0de-4eec-ac44-fe7a24812d46&Output=JSON"
+    response = requests.get(ewp_url)
+    ewp_data = json.loads(response.text)
+    email = ewp_data[0]['Email']
 
-def send_email(six_s_form,request,status=None):
+    # Set up the email parameters
+    sender = 'vincent@shortage_email.com'
+    recipients = email
+    reply_to = 'vincent@example.com'
+    subject = 'Shortage Update'
+    message_body = f"""
+        A shortage has been updated with new information:
 
-    # Try and get email details fill with default information if there is any error
-    email_dict = {}
-    try:
-        email_dict['status'] = status
-        email_dict['name'] = request.META['HTTP_X_DEADBOLT_NAME']
-        email_dict['username'] = request.META['HTTP_X_DEADBOLT_PREFERRED_USERNAME']
-        email_dict['email'] = request.META['HTTP_X_DEADBOLT_EMAIL']
+        Business Unit: {data['business_unit']}
+        Ship: {data['ship']}
+        TVE: {data['tve']}
+        Part Number: {data['part_number']}
+        Description: {data['description']}
+        Assembly: {data['assembly']}
+        Quantity: {data['qty']}
+        Code: {data['code']}
+        Owner: {data['owner']}
+        Need Date: {data['need_date']}
+        ECD: {data['ecd']}
+        Previous ECD: {data['previous_ecd']}
+        Impact: {data['impact']}
+        Comment: {data['comment']}
+        Status: {data['status']}
+        Last Edit: {data['last_edit']}
+        Added Date: {data['added_date']}
+        On Board: {data['on_board']}
+        Closed Date: {data['closed_date']}
+        Manager: {data['manager']}
 
-    except Exception as e :
-        email_dict['status'] = status
-        email_dict['name'] = 'Vincent'
-        email_dict['username'] = 'e447955'
-        email_dict['email'] = 'vincent.v.do@lmco.com'
+        Please review this information and take any necessary actions.
+    """
 
-
-
-    # Instantiate email object
+    # Send the email
     emailer = le.lmco_email(
         sender = sender
-        ,recipients= email_dict['email']
-        ,reply_to= reply_back
+        ,recipients= recipients
+        ,reply_to= reply_to
         ,server='relay-lmi.ems.lmco.com'
         ,port=25
     )
-    print(emailer.server)
-    print('Sending test email')
-
-
-    emailer.send_mail(
-        subject='6S FORM CONFIRMATION'
-        ,message_body=f'''
-        
-        Hello {email_dict['name']}, This is an email to confirm 6S App Form Submission/Update:
-
-        
-        6S SCORE {six_s_form.six_s_score}
-        Date: {six_s_form.date_created}
-
-        Line of Business: {six_s_form.line_of_business}
-        Site: {six_s_form.site}
-        Area: {six_s_form.area}
-        Zone: {six_s_form.zone}
-        PMT: {six_s_form.pmt}
-
-
-        Sender: {emailer.sender}
-        Recipients(s): {emailer.recipients}
-        Reply-To: {emailer.reply_to}
-        Server: {emailer.server}
-        Port: {emailer.port}
-        '''
-    )
+    emailer.send_mail(subject, message_body)
     print("Email Sent")
 
-
-
-
-if __name__ == '__main__':
-    sender = 'vincent.v.do@lmco.com'
-    receiver = 'vincent.v.do@lmco.com'
-    send_email(sender,receiver)
+# if __name__ == '__main__':
+#     sender = 'vincent.v.do@lmco.com'
+#     receiver = 'vincent.v.do@lmco.com'
+#     send_email(sender,receiver)

@@ -4,6 +4,7 @@ from sqlalchemy.sql import text
 from flask_cors import cross_origin
 from config import app, con
 from datetime import datetime
+from email_util import send_update_email
 
 # Get all records in datatable
 
@@ -127,6 +128,9 @@ def update_data(_id):
 
     commit_text = text("COMMIT;")
     con.execute(commit_text)
+    
+    # Call the send_update_email function with the data from the PUT request
+    send_update_email(data)
 
     # HTTP 200 OK
     return jsonify({"Data was successfully updated. id": _id}), 200
