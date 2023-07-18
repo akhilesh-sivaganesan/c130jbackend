@@ -125,52 +125,65 @@ def delete_data(_id):
     return jsonify({"Data was successfully deleted. id": _id}), 200
 
 def parse_date(date_str):
-    if not date_str:
+    if not date_str or date_str == 'DLVD' or date_str == 'W/A':
         return None
     try:
         return datetime.strptime(date_str, '%m/%d/%Y').date()
-    except ValueError:
+    except Exception as error:
+        print(error)
         return None
+    
 
 def parse_int(int_str):
     if not int_str:
         return None
-    try:
-        return int(int_str)
-    except ValueError:
-        return None
+    return int(int_str)
 
 @app.route('/datatable/sync', methods=['POST'])
 def sync():
-    try:
         data = request.get_json(force=True)
         # print(data)
         # Insert data into Postgres table
-        for row in data:
-            # Validate data
-            row['closed_date'] = parse_date(row['closed_date'])
-            row['last_edit'] = parse_date(row['last_edit'])
-            row['need_date'] = parse_date(row['need_date'])
-            row['qty'] = parse_int(row['qty'])
-            row['ecd'] = parse_date(row['ecd'])
-            row['added_date'] = parse_date(row['added_date'])
+        for index, row in enumerate(data):
+            if not row['business_unit']:
+                continue
+            try:
+                # if index == 0:
+                #     print(row)
+                # Validate data
+                row['closed_date'] = parse_date(row['closed_date'])
+                row['last_edit'] = parse_date(row['last_edit'])
+                row['need_date'] = parse_date(row['need_date'])
+                row['qty'] = parse_int(row['qty'])
+                row['ecd'] = parse_date(row['ecd'])
+                row['added_date'] = parse_date(row['added_date'])
+                row['status'] = row['status'].upper()
 
-            # Check if previous_ecd is present in row
-            if 'previous_ecd' not in row:
-                row['previous_ecd'] = None
-            else:
-                row['previous_ecd'] = parse_date(row['previous_ecd'])
-            # Check if ntid is present in row
-            if 'ntid' not in row:
-                row['ntid'] = None
-            # Create insert statement
-            insert_stmt = text('INSERT INTO osf_public.datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid, previous_ecd) VALUES (:business_unit,:ship,:tve,:part_number,:description,:assembly,:qty,:code,:owner,:need_date,:ecd,:impact,:comment,:status,:last_edit,:added_date,:on_board,:closed_date,:manager,:ntid,:previous_ecd)')
-            # Execute insert statement
-            con.execute(insert_stmt,row)
+                # Check if previous_ecd is present in row
+                if 'previous_ecd' not in row:
+                    row['previous_ecd'] = None
+                else:
+                    row['previous_ecd'] = parse_date(row['previous_ecd'])
+                # Check if ntid is present in row
+                if 'ntid' not in row:
+                    row['ntid'] = None
+
+                select_stmt = text('SELECT * FROM osf_public.datatable WHERE business_unit=:business_unit AND ship=:ship AND tve=:tve AND part_number=:part_number AND description=:description AND assembly=:assembly AND qty=:qty AND code=:code AND owner=:owner AND need_date=:need_date AND ecd=:ecd AND impact=:impact AND comment=:comment AND status=:status AND last_edit=:last_edit AND added_date=:added_date AND on_board=:on_board AND closed_date=:closed_date AND manager=:manager')
+                result = con.execute(select_stmt, row).fetchone()
+                if not result:
+                    # Create insert statement
+                    insert_stmt = text('INSERT INTO osf_public.datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid, previous_ecd) VALUES (:business_unit,:ship,:tve,:part_number,:description,:assembly,:qty,:code,:owner,:need_date,:ecd,:impact,:comment,:status,:last_edit,:added_date,:on_board,:closed_date,:manager,:ntid,:previous_ecd)')
+                    # Execute insert statement
+                    con.execute(insert_stmt,row)
+                    commit_text = text("COMMIT;")
+                    con.execute(commit_text)
+            except Exception as error:
+                print('Here error', error)
+                print('Here index', index)
+                print('here row', row)
+                return 'An error occurred while syncing data', 500
         return 'Data synced successfully', 200
-    except Exception as error:
-        print(error)
-        return 'An error occurred while syncing data', 500
+    
 
 
 
