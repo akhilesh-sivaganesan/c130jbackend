@@ -63,6 +63,8 @@ def get_owner_data(owner):
         if tempDict['closed_date']:
             duration_days = tempDict['closed_date'] - tempDict['added_date']
         tempDict['duration_days'] = duration_days.days
+        if not tempDict['last_edit']:
+            tempDict['last_edit'] = tempDict['added_date']
         duration_edits = datetime.now() - tempDict['last_edit']
         tempDict['duration_edits'] = duration_edits.days
         final_result.append(tempDict)
