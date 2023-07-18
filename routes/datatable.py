@@ -18,7 +18,10 @@ def get_all_data():
     for r in rows:
         tempDict = dict(r._mapping.items())
         # Convert ntid from string to array
-        tempDict['ntid'] = tempDict['ntid'].split(',')
+        if tempDict['ntid'] is None:
+            tempDict['ntid'] = []
+        else:
+            tempDict['ntid'] = tempDict['ntid'].split(',')
         duration_days = datetime.now() - tempDict['added_date']
         if tempDict['closed_date']:
             duration_days = tempDict['closed_date'] - tempDict['added_date']
@@ -41,7 +44,10 @@ def get_open_data():
     for r in rows:
         tempDict = dict(r._mapping.items())
         # Convert ntid from string to array
-        tempDict['ntid'] = tempDict['ntid'].split(',')
+        if tempDict['ntid'] is None:
+            tempDict['ntid'] = []
+        else:
+            tempDict['ntid'] = tempDict['ntid'].split(',')
         duration_days = datetime.now() - tempDict['added_date']
         if tempDict['closed_date']:
             duration_days = tempDict['closed_date'] - tempDict['added_date']
@@ -64,7 +70,10 @@ def get_owner_data(owner):
     for r in rows:
         tempDict = dict(r._mapping.items())
         # Convert ntid from string to array
-        tempDict['ntid'] = tempDict['ntid'].split(',')
+        if tempDict['ntid'] is None:
+            tempDict['ntid'] = []
+        else:
+            tempDict['ntid'] = tempDict['ntid'].split(',')
         duration_days = datetime.now() - tempDict['added_date']
         if tempDict['closed_date']:
             duration_days = tempDict['closed_date'] - tempDict['added_date']

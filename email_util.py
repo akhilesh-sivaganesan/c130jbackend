@@ -9,8 +9,8 @@ from .lmco_email import lmco_email as le
 
 print("Hello World")
 
-sender = 'jawad.iqbal@lmco.com'
-reply_back = 'jawad.iqbal@lmco.com, eric.d.czarnecki@lmco.com'
+sender = 'vincent.v.do@lmco.com'
+reply_back = 'vincent.v.do@lmco.com'
 
 def send_feedback(feedback,request):
 
@@ -22,12 +22,12 @@ def send_feedback(feedback,request):
         email_dict['email'] = request.META['HTTP_X_DEADBOLT_EMAIL']
 
     except Exception as e :
-        email_dict['name'] = 'Jawad'
-        email_dict['username'] = 'e408811'
-        email_dict['email'] = 'jawad.iqbal@lmco.com'
+        email_dict['name'] = 'Vincent'
+        email_dict['username'] = 'e447955'
+        email_dict['email'] = 'vincent.v.do@lmco.com'
 
-    recipients = f"jawad.iqbal@lmco.com,eric.d.czarnecki@lmco.com,{email_dict['email']}"
-    reply_to = f"jawad.iqbal@lmco.com,eric.d.czarnecki@lmco.com,{email_dict['email']}"
+    recipients = f"vincent.v.do@lmco.com,{email_dict['email']}"
+    reply_to = f"vincent.v.do@lmco.com,{email_dict['email']}"
 
     emailer = le.lmco_email(
         sender = sender
@@ -39,10 +39,10 @@ def send_feedback(feedback,request):
     print(emailer.server)
     print('Sending test email')
     emailer.send_mail(
-        subject=f'6S APP FEEDBACK FROM {email_dict["name"]}'
+        subject=f'SHORTAGE APP UPDATE FROM {email_dict["name"]}'
         ,message_body=f'''
         
-        6S APP FEEDBACK FROM {email_dict["name"]}:
+        SHORTAGE APP UPDATE FROM {email_dict["name"]}:
 
         NTID : {email_dict["username"]}
 
@@ -76,9 +76,9 @@ def send_email(six_s_form,request,status=None):
 
     except Exception as e :
         email_dict['status'] = status
-        email_dict['name'] = 'Jawad'
-        email_dict['username'] = 'e408811'
-        email_dict['email'] = 'jawad.iqbal@lmco.com'
+        email_dict['name'] = 'Vincent'
+        email_dict['username'] = 'e447955'
+        email_dict['email'] = 'vincent.v.do@lmco.com'
 
 
 
@@ -124,6 +124,6 @@ def send_email(six_s_form,request,status=None):
 
 
 if __name__ == '__main__':
-    sender = '6s_aero@lmco.com'
-    receiver = 'jawad.iqbal@lmco.com'
+    sender = 'vincent.v.do@lmco.com'
+    receiver = 'vincent.v.do@lmco.com'
     send_email(sender,receiver)
