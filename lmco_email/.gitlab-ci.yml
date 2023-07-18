@@ -1,0 +1,40 @@
+variables:
+  PYTHON_PACKAGE_NAME: lmco_email
+
+image: registry.us.lmco.com/lmco-library/python:3.7
+
+stages:
+  - build
+  - deploy
+
+wheel:
+  stage: build
+  tags:
+    - docker
+  script:
+    - python setup.py sdist bdist_wheel
+    - ls ./dist
+    - mv dist/$PYTHON_PACKAGE_NAME-*.tar.gz dist/$PYTHON_PACKAGE_NAME-latest.tar.gz
+    - mv dist/$PYTHON_PACKAGE_NAME-*-py3-none-any.whl dist/$PYTHON_PACKAGE_NAME-latest-py3-none-any.whl
+    - ls ./dist
+  artifacts:
+    paths:
+      - dist
+    expire_in: 1 day
+
+pages:
+  stage: deploy
+  only:
+    - tags
+  tags: 
+    - docker
+  before_script:
+    - "true"
+  script:
+    - mkdir -p public/
+    - cp -fr dist/* public/
+  dependencies:
+    - wheel
+  artifacts:
+    paths:
+      - public

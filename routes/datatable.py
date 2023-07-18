@@ -17,6 +17,8 @@ def get_all_data():
     final_result = []
     for r in rows:
         tempDict = dict(r._mapping.items())
+        # Convert ntid from string to array
+        tempDict['ntid'] = tempDict['ntid'].split(',')
         duration_days = datetime.now() - tempDict['added_date']
         if tempDict['closed_date']:
             duration_days = tempDict['closed_date'] - tempDict['added_date']
@@ -38,6 +40,8 @@ def get_open_data():
     final_result = []
     for r in rows:
         tempDict = dict(r._mapping.items())
+        # Convert ntid from string to array
+        tempDict['ntid'] = tempDict['ntid'].split(',')
         duration_days = datetime.now() - tempDict['added_date']
         if tempDict['closed_date']:
             duration_days = tempDict['closed_date'] - tempDict['added_date']
@@ -59,6 +63,8 @@ def get_owner_data(owner):
     final_result = []
     for r in rows:
         tempDict = dict(r._mapping.items())
+        # Convert ntid from string to array
+        tempDict['ntid'] = tempDict['ntid'].split(',')
         duration_days = datetime.now() - tempDict['added_date']
         if tempDict['closed_date']:
             duration_days = tempDict['closed_date'] - tempDict['added_date']
@@ -85,9 +91,10 @@ def get_owners():
 @cross_origin()
 def create_data():
     data = request.get_json(force=True)
-    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, previous_ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', NULL, '%s', '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s') RETURNING id;" % (
-        data['business_unit'], data['ship'], data['tve'], data['part_number'], data['description'], data['assembly'], data['qty'], data['code'], data['owner'], data['need_date'], data['ecd'], data['impact'], data['comment'], data['status'], data['last_edit'], data['added_date'], data['on_board'], data['manager'], data['ntid']))
-    result = con.execute(insert_query)
+    # Convert ntid from array to string
+    data['ntid'] = ','.join(data['ntid'])
+    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, previous_ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES (:business_unit,:ship,:tve,:part_number,:description,:assembly,:qty,:code,:owner,:need_date,:ecd,NULL,:impact,:comment,:status,:last_edit,:added_date,:on_board,NULL,:manager,:ntid) RETURNING id;")
+    result = con.execute(insert_query,data)
     new_id = result.fetchone()[0]
 
     commit_text = text("COMMIT;")
@@ -103,6 +110,8 @@ def create_data():
 @cross_origin()
 def update_data(_id):
     data = request.get_json(force=True)
+    # Convert ntid from array to string
+    data['ntid'] = ','.join(data['ntid'])
     update_query = text("UPDATE datatable SET business_unit = :business_unit, ship = :ship, tve = :tve, part_number = :part_number, description = :description, assembly = :assembly, qty = :qty, code = :code, owner = :owner, need_date = :need_date, ecd = :ecd, previous_ecd = :previous_ecd, impact = :impact, comment = :comment, status = :status, last_edit = :last_edit, added_date = :added_date, on_board = :on_board, closed_date = :closed_date, manager = :manager, ntid = :ntid WHERE id = :id")
     con.execute(update_query, {
         'business_unit': data['business_unit'], 'ship': data['ship'], 'tve': data['tve'], 'part_number': data['part_number'], 'description': data['description'], 'assembly': data['assembly'], 'qty': data['qty'], 'code': data['code'], 'owner': data['owner'], 'need_date': data['need_date'], 'ecd': data['ecd'], 'previous_ecd': data['previous_ecd'], 'impact': data['impact'], 'comment': data['comment'], 'status': data['status'], 'last_edit': data['last_edit'], 'added_date': data['added_date'], 'on_board': data['on_board'], 'closed_date': data['closed_date'], 'manager': data['manager'], 'ntid': data['ntid'], 'id': _id})
