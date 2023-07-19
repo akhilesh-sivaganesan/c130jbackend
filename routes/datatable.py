@@ -110,6 +110,10 @@ def create_data():
     commit_text = text("COMMIT;")
     con.execute(commit_text)
 
+    # Call the send_update_email function with the data from the PUT request if ntid is not empty
+    if data['ntid']:
+        send_update_email(data)
+        
     # HTTP 201 Created
     return jsonify({"Data was successfully created. id": new_id}), 201
 
@@ -129,8 +133,9 @@ def update_data(_id):
     commit_text = text("COMMIT;")
     con.execute(commit_text)
     
-    # Call the send_update_email function with the data from the PUT request
-    send_update_email(data)
+    # Call the send_update_email function with the data from the PUT request if ntid is not empty
+    if data['ntid']:
+        send_update_email(data)
 
     # HTTP 200 OK
     return jsonify({"Data was successfully updated. id": _id}), 200

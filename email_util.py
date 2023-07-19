@@ -65,19 +65,21 @@ def send_feedback(feedback,request):
     print("Email Sent")
 
 def send_update_email(data):
-    # Extract the NTID from the data
-    ntid = data['ntid']
+    # Extract the NTIDs from the data
+    ntids = data['ntid'].split(',')
 
-    # Make an API call to the EWP PersonService to get the email address for the NTID
-    ewp_url = f"https://api-ewp.global.lmco.com/PersonService?Search={ntid}&APIKey=f3505421-a0de-4eec-ac44-fe7a24812d46&Output=JSON"
-    response = requests.get(ewp_url)
-    ewp_data = json.loads(response.text)
-    email = ewp_data[0]['Email']
+    # Make an API call to the EWP PersonService for each NTID to get the email addresses
+    recipients = []
+    for ntid in ntids:
+        ewp_url = f"https://api-ewp.global.lmco.com/PersonService?Search={ntid}&APIKey=f3505421-a0de-4eec-ac44-fe7a24812d46&Output=JSON"
+        response = requests.get(ewp_url)
+        ewp_data = json.loads(response.text)
+        email = ewp_data[0]['Email']
+        recipients.append(email)
 
     # Set up the email parameters
-    sender = 'vincent@shortage_email.com'
-    recipients = email
-    reply_to = 'vincent@example.com'
+    sender = 'C-130J@shortage_email.com'
+    reply_to = 'vincent.v.do@lmco.com'
     subject = 'Shortage Update'
     message_body = f"""
         A shortage has been updated with new information:
@@ -106,16 +108,18 @@ def send_update_email(data):
         Please review this information and take any necessary actions.
     """
 
-    # Send the email
-    emailer = le.lmco_email(
-        sender = sender
-        ,recipients= recipients
-        ,reply_to= reply_to
-        ,server='relay-lmi.ems.lmco.com'
-        ,port=25
-    )
-    emailer.send_mail(subject, message_body)
-    print("Email Sent")
+    # Send a separate email to each recipient
+    for recipient in recipients:
+        emailer = le.lmco_email(
+            sender=sender,
+            recipients=recipient,
+            reply_to=reply_to,
+            server='relay-lmi.ems.lmco.com',
+            port=25
+        )
+        emailer.send_mail(subject, message_body)
+    
+    print("Emails Sent")
 
 # if __name__ == '__main__':
 #     sender = 'vincent.v.do@lmco.com'
