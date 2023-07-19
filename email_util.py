@@ -14,7 +14,8 @@ print("Hello World")
 sender = 'vincent.v.do@lmco.com'
 reply_back = 'vincent.v.do@lmco.com'
 
-def send_feedback(feedback,request):
+
+def send_feedback(feedback, request):
 
     # Try and get email details
     email_dict = {}
@@ -23,7 +24,7 @@ def send_feedback(feedback,request):
         email_dict['username'] = request.META['HTTP_X_DEADBOLT_PREFERRED_USERNAME']
         email_dict['email'] = request.META['HTTP_X_DEADBOLT_EMAIL']
 
-    except Exception as e :
+    except Exception as e:
         email_dict['name'] = 'Vincent'
         email_dict['username'] = 'e447955'
         email_dict['email'] = 'vincent.v.do@lmco.com'
@@ -32,17 +33,12 @@ def send_feedback(feedback,request):
     reply_to = f"vincent.v.do@lmco.com,{email_dict['email']}"
 
     emailer = le.lmco_email(
-        sender = sender
-        ,recipients= recipients
-        ,reply_to= reply_to
-        ,server='relay-lmi.ems.lmco.com'
-        ,port=25
+        sender=sender, recipients=recipients, reply_to=reply_to, server='relay-lmi.ems.lmco.com', port=25
     )
     print(emailer.server)
     print('Sending test email')
     emailer.send_mail(
-        subject=f'SHORTAGE APP UPDATE FROM {email_dict["name"]}'
-        ,message_body=f'''
+        subject=f'SHORTAGE APP UPDATE FROM {email_dict["name"]}', message_body=f'''
         
         SHORTAGE APP UPDATE FROM {email_dict["name"]}:
 
@@ -64,6 +60,7 @@ def send_feedback(feedback,request):
     )
     print("Email Sent")
 
+
 def send_update_email(data):
     # Extract the NTIDs from the data
     ntids = data['ntid'].split(',')
@@ -78,11 +75,13 @@ def send_update_email(data):
         recipients.append(email)
 
     # Set up the email parameters
-    sender = 'C-130J@shortage_email.com'
-    reply_to = 'vincent.v.do@lmco.com'
-    subject = 'Shortage Update'
-    message_body = f"""
-        A shortage has been updated with new information:
+        sender = 'jawad.iqbal@lmco.com'
+        reply_to = 'jawad.iqbal@lmco.com'
+        subject = f"Shortage Update - Part Number: {data['part_number']}"
+        message_body = f"""
+        A shortage has been updated with new information. You can access the shortage info directly through this link:
+
+        http://c-130j-shortages.apps.pgw2.us.lmco.com/editor?owner={data['owner']}&id={data['id']}
 
         Business Unit: {data['business_unit']}
         Ship: {data['ship']}
@@ -118,7 +117,7 @@ def send_update_email(data):
             port=25
         )
         emailer.send_mail(subject, message_body)
-    
+
     print("Emails Sent")
 
 # if __name__ == '__main__':
