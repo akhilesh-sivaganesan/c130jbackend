@@ -5,6 +5,7 @@ from flask_cors import cross_origin
 from config import app, con
 from datetime import datetime
 from email_util import send_update_email
+from urllib.parse import unquote
 
 # Get all records in datatable
 
@@ -60,9 +61,11 @@ def get_open_data():
     return final_response, 200
 
 
-@app.route('/datatable/owner/<string:owner>', methods=['GET'])
+@app.route('/datatable/owner/<path:owner>', methods=['GET'])
 @cross_origin()
 def get_owner_data(owner):
+    owner = unquote(owner)
+    print(owner)
     select_query = text(
         'SELECT * FROM osf_public.datatable WHERE owner = :owner')
     rs = con.execute(select_query, {'owner': owner})
