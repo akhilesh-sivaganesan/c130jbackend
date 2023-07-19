@@ -11,3 +11,4 @@ flask_restful
 flask-swagger-ui==3.20.9
 sqlalchemy==2.0.15
 psycopg2==2.9.6
+dnspython
