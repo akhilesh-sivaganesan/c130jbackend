@@ -64,12 +64,12 @@ def send_feedback(feedback, request):
 def send_update_email(data):
     # Extract the NTIDs from the data
     ntids = data['ntid'].split(',')
-    print("Searching for NTIDs to Email")
+    print("Searching for NTIDs to Email - SSL Bypass")
     # Make an API call to the EWP PersonService for each NTID to get the email addresses
     recipients = []
     for ntid in ntids:
         ewp_url = f"https://api-ewp.global.lmco.com/PersonService?Search={ntid}&APIKey=f3505421-a0de-4eec-ac44-fe7a24812d46&Output=JSON"
-        response = requests.get(ewp_url)
+        response = requests.get(ewp_url, verify=False)
         ewp_data = json.loads(response.text)
         email = ewp_data[0]['Email']
         recipients.append(email)
