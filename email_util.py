@@ -71,41 +71,44 @@ def send_update_email(data):
         ewp_url = f"https://api-ewp.global.lmco.com/PersonService?Search={ntid}&APIKey=f3505421-a0de-4eec-ac44-fe7a24812d46&Output=JSON"
         response = requests.get(ewp_url, verify=False)
         ewp_data = json.loads(response.text)
-        email = ewp_data[0]['Email']
-        recipients.append(email)
+        if ewp_data:
+            email = ewp_data[0]['Email']
+            recipients.append(email)
+        else:
+            print(f"No email found for NTID: {ntid}")
 
     # Set up the email parameters
-        sender = 'jawad.iqbal@lmco.com'
-        reply_to = 'jawad.iqbal@lmco.com'
-        subject = f"Shortage Update - Part Number: {data['part_number']}"
-        message_body = f"""
-        A shortage has been updated with new information. You can access the shortage info directly through this link:
+    sender = 'jawad.iqbal@lmco.com'
+    reply_to = 'jawad.iqbal@lmco.com'
+    subject = f"Shortage Update - Part Number: {data['part_number']}"
+    message_body = f"""
+    A shortage has been updated with new information. You can access the shortage info directly through this link:
 
-        http://c-130j-shortages.apps.pgw2.us.lmco.com/editor?owner={data['owner']}&id={data['id']}
+    http://c-130j-shortages.apps.pgw2.us.lmco.com/editor?owner={data['owner']}&id={data['id']}
 
-        Business Unit: {data['business_unit']}
-        Ship: {data['ship']}
-        TVE: {data['tve']}
-        Part Number: {data['part_number']}
-        Description: {data['description']}
-        Assembly: {data['assembly']}
-        Quantity: {data['qty']}
-        Code: {data['code']}
-        Owner: {data['owner']}
-        Need Date: {data['need_date']}
-        ECD: {data['ecd']}
-        Previous ECD: {data['previous_ecd']}
-        Impact: {data['impact']}
-        Comment: {data['comment']}
-        Status: {data['status']}
-        Last Edit: {data['last_edit']}
-        Added Date: {data['added_date']}
-        On Board: {data['on_board']}
-        Closed Date: {data['closed_date']}
-        Manager: {data['manager']}
+    Business Unit: {data['business_unit']}
+    Ship: {data['ship']}
+    TVE: {data['tve']}
+    Part Number: {data['part_number']}
+    Description: {data['description']}
+    Assembly: {data['assembly']}
+    Quantity: {data['qty']}
+    Code: {data['code']}
+    Owner: {data['owner']}
+    Need Date: {data['need_date']}
+    ECD: {data['ecd']}
+    Previous ECD: {data['previous_ecd']}
+    Impact: {data['impact']}
+    Comment: {data['comment']}
+    Status: {data['status']}
+    Last Edit: {data['last_edit']}
+    Added Date: {data['added_date']}
+    On Board: {data['on_board']}
+    Closed Date: {data['closed_date']}
+    Manager: {data['manager']}
 
-        Please review this information and take any necessary actions.
-    """
+    Please review this information and take any necessary actions.
+"""
 
     # Send a separate email to each recipient
     for recipient in recipients:
@@ -117,7 +120,7 @@ def send_update_email(data):
             port=25
         )
         emailer.send_mail(subject, message_body)
-
+        
     print("Emails Sent")
 
 # if __name__ == '__main__':
