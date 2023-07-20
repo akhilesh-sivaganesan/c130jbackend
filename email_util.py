@@ -64,7 +64,7 @@ def send_feedback(feedback, request):
 def send_update_email(data):
     # Extract the NTIDs from the data
     ntids = data['ntid'].split(',')
-
+    print("Searching for NTIDs to Email")
     # Make an API call to the EWP PersonService for each NTID to get the email addresses
     recipients = []
     for ntid in ntids:
