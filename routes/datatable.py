@@ -36,7 +36,6 @@ def get_all_data():
     final_response = jsonify(final_result)
     return final_response, 200
 
-
 @app.route('/datatable/open', methods=['GET'])
 @cross_origin()
 def get_open_data():
@@ -58,11 +57,15 @@ def get_open_data():
         tempDict['duration_days'] = duration_days.days
         if not tempDict['last_edit']:
             tempDict['last_edit'] = tempDict['added_date']
-        duration_edits = datetime.now() - tempDict['last_edit']
-        tempDict['duration_edits'] = duration_edits.days
+        if tempDict['last_edit'] > datetime.now():
+            tempDict['duration_edits'] = 0
+        else:
+            duration_edits = datetime.now() - tempDict['last_edit']
+            tempDict['duration_edits'] = duration_edits.days
         final_result.append(tempDict)
     final_response = jsonify(final_result)
     return final_response, 200
+
 
 
 @app.route('/datatable/owner/<path:owner>', methods=['GET'])
@@ -177,10 +180,17 @@ def parse_int(int_str):
 
 @app.route('/datatable/sync', methods=['POST'])
 def sync():
+        # Delete all entries in the table
+        delete_stmt = text('DELETE FROM osf_public.datatable')
+        con.execute(delete_stmt)
+        commit_text = text("COMMIT;")
+        con.execute(commit_text)
+        
         data = request.get_json(force=True)
         # print(data)
         # Insert data into Postgres table
         for index, row in enumerate(data):
+            print('Index: ', index)
             if not row['business_unit']:
                 continue
             try:
