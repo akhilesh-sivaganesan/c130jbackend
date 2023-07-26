@@ -113,7 +113,7 @@ def create_data():
     data = request.get_json(force=True)
     # Convert ntid from array to string
     data['ntid'] = ','.join(data['ntid'])
-    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, previous_ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid) VALUES (:business_unit,:ship,:tve,:part_number,:description,:assembly,:qty,:code,:owner,:need_date,:ecd,NULL,:impact,:comment,:status,:last_edit,:added_date,:on_board,NULL,:manager,:ntid) RETURNING id;")
+    insert_query = text("INSERT INTO datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, previous_ecd, impact, comment, status, last_edit, added_date, plan, closed_date, manager, ntid) VALUES (:business_unit,:ship,:tve,:part_number,:description,:assembly,:qty,:code,:owner,:need_date,:ecd,NULL,:impact,:comment,:status,:last_edit,:added_date,:plan,NULL,:manager,:ntid) RETURNING id;")
     result = con.execute(insert_query,data)
     new_id = result.fetchone()[0]
 
@@ -136,9 +136,9 @@ def update_data(_id):
     data = request.get_json(force=True)
     # Convert ntid from array to string
     data['ntid'] = ','.join(data['ntid'])
-    update_query = text("UPDATE datatable SET business_unit = :business_unit, ship = :ship, tve = :tve, part_number = :part_number, description = :description, assembly = :assembly, qty = :qty, code = :code, owner = :owner, need_date = :need_date, ecd = :ecd, previous_ecd = :previous_ecd, impact = :impact, comment = :comment, status = :status, last_edit = :last_edit, added_date = :added_date, on_board = :on_board, closed_date = :closed_date, manager = :manager, ntid = :ntid WHERE id = :id")
+    update_query = text("UPDATE datatable SET business_unit = :business_unit, ship = :ship, tve = :tve, part_number = :part_number, description = :description, assembly = :assembly, qty = :qty, code = :code, owner = :owner, need_date = :need_date, ecd = :ecd, previous_ecd = :previous_ecd, impact = :impact, comment = :comment, status = :status, last_edit = :last_edit, added_date = :added_date, plan = :plan, closed_date = :closed_date, manager = :manager, ntid = :ntid WHERE id = :id")
     con.execute(update_query, {
-        'business_unit': data['business_unit'], 'ship': data['ship'], 'tve': data['tve'], 'part_number': data['part_number'], 'description': data['description'], 'assembly': data['assembly'], 'qty': data['qty'], 'code': data['code'], 'owner': data['owner'], 'need_date': data['need_date'], 'ecd': data['ecd'], 'previous_ecd': data['previous_ecd'], 'impact': data['impact'], 'comment': data['comment'], 'status': data['status'], 'last_edit': data['last_edit'], 'added_date': data['added_date'], 'on_board': data['on_board'], 'closed_date': data['closed_date'], 'manager': data['manager'], 'ntid': data['ntid'], 'id': _id})
+        'business_unit': data['business_unit'], 'ship': data['ship'], 'tve': data['tve'], 'part_number': data['part_number'], 'description': data['description'], 'assembly': data['assembly'], 'qty': data['qty'], 'code': data['code'], 'owner': data['owner'], 'need_date': data['need_date'], 'ecd': data['ecd'], 'previous_ecd': data['previous_ecd'], 'impact': data['impact'], 'comment': data['comment'], 'status': data['status'], 'last_edit': data['last_edit'], 'added_date': data['added_date'], 'plan': data['plan'], 'closed_date': data['closed_date'], 'manager': data['manager'], 'ntid': data['ntid'], 'id': _id})
 
     commit_text = text("COMMIT;")
     con.execute(commit_text)
@@ -214,11 +214,11 @@ def sync():
                 if 'ntid' not in row:
                     row['ntid'] = None
 
-                select_stmt = text('SELECT * FROM osf_public.datatable WHERE business_unit=:business_unit AND ship=:ship AND tve=:tve AND part_number=:part_number AND description=:description AND assembly=:assembly AND qty=:qty AND code=:code AND owner=:owner AND need_date=:need_date AND ecd=:ecd AND impact=:impact AND comment=:comment AND status=:status AND last_edit=:last_edit AND added_date=:added_date AND on_board=:on_board AND closed_date=:closed_date AND manager=:manager')
+                select_stmt = text('SELECT * FROM osf_public.datatable WHERE business_unit=:business_unit AND ship=:ship AND tve=:tve AND part_number=:part_number AND description=:description AND assembly=:assembly AND qty=:qty AND code=:code AND owner=:owner AND need_date=:need_date AND ecd=:ecd AND impact=:impact AND comment=:comment AND status=:status AND last_edit=:last_edit AND added_date=:added_date AND plan=:plan AND closed_date=:closed_date AND manager=:manager')
                 result = con.execute(select_stmt, row).fetchone()
                 if not result:
                     # Create insert statement
-                    insert_stmt = text('INSERT INTO osf_public.datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, on_board, closed_date, manager, ntid, previous_ecd) VALUES (:business_unit,:ship,:tve,:part_number,:description,:assembly,:qty,:code,:owner,:need_date,:ecd,:impact,:comment,:status,:last_edit,:added_date,:on_board,:closed_date,:manager,:ntid,:previous_ecd)')
+                    insert_stmt = text('INSERT INTO osf_public.datatable (business_unit, ship, tve, part_number, description, assembly, qty, code, owner, need_date, ecd, impact, comment, status, last_edit, added_date, plan, closed_date, manager, ntid, previous_ecd) VALUES (:business_unit,:ship,:tve,:part_number,:description,:assembly,:qty,:code,:owner,:need_date,:ecd,:impact,:comment,:status,:last_edit,:added_date,:plan,:closed_date,:manager,:ntid,:previous_ecd)')
                     # Execute insert statement
                     con.execute(insert_stmt,row)
                     commit_text = text("COMMIT;")
